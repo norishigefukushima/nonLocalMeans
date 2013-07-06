@@ -70,7 +70,7 @@ public:
 								t+=cstep;
 								s+=cstep;
 							}
-							const int ediv = e*tdiv;
+							const int ediv = cvRound(e*tdiv);
 							float www=w[ediv];
 
 							const T* ss = sptr2+imstep*(tr+l)+3*(tr+k);
@@ -121,7 +121,7 @@ public:
 								t+=cstep;
 								s+=cstep;
 							}
-							const int ediv = e*tdiv;
+							const int ediv = cvRound(e*tdiv);
 							float www=w[ediv];
 							value+=sptr2[imstep*(tr+l)+tr+k]*www;
 							//get weighted Euclidean distance
@@ -129,8 +129,7 @@ public:
 						}
 					}
 					//weight normalization
-					T v=value/tweight;
-					*(d++) = saturate_cast<T>(v); 
+					*(d++) = saturate_cast<T>(value/tweight); 
 				}//i
 			}//j
 		}
