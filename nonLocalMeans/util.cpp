@@ -99,20 +99,20 @@ void cvtColorBGR2PLANE_32f( const Mat& src, Mat& dest)
 		aa=_mm_blend_ps(aa,b,4);
 		__m128 cc= _mm_shuffle_ps(c,c,_MM_SHUFFLE(1,3,2,0));
 		aa=_mm_blend_ps(aa,cc,8);
-		_mm_stream_ps((B),aa);
+		_mm_storeu_ps((B),aa);
 
 		aa = _mm_shuffle_ps(a,a,_MM_SHUFFLE(3,2,0,1));
 		__m128 bb = _mm_shuffle_ps(b,b,_MM_SHUFFLE(2,3,0,1));
 		bb=_mm_blend_ps(bb,aa,1);
 		cc= _mm_shuffle_ps(c,c,_MM_SHUFFLE(2,3,1,0));
 		bb=_mm_blend_ps(bb,cc,8);
-		_mm_stream_ps((G),bb);
+		_mm_storeu_ps((G),bb);
 
 		aa = _mm_shuffle_ps(a,a,_MM_SHUFFLE(3,1,0,2));
 		bb=_mm_blend_ps(aa,b,2);
 		cc= _mm_shuffle_ps(c,c,_MM_SHUFFLE(3,0,1,2));
 		cc=_mm_blend_ps(bb,cc,12);
-		_mm_stream_ps((R),cc);
+		_mm_storeu_ps((R),cc);
 
 		s+=12;
 		R+=4;
