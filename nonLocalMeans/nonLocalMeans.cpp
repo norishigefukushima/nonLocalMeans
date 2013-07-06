@@ -1,6 +1,5 @@
 #include "nonLocalMeans.hpp"
 
-
 using namespace cv;
 template <class T>
 class NonlocalMeansFilterBaseInvorker_ : public cv::ParallelLoopBody
@@ -23,12 +22,8 @@ public:
 	{
 		const int tr = templeteWindowSize>>1;
 		const int sr = searchWindowSize>>1;
-		const int D = searchWindowSize*searchWindowSize;
 		const int cstep  = (im->cols-templeteWindowSize)*im->channels();
-		const int csstep = (im->cols-searchWindowSize  )*im->channels();
 		const int imstep = im->cols*im->channels();
-
-		const int H=D/2+1;
 
 		const int tD = templeteWindowSize*templeteWindowSize;
 		const double tdiv = 1.0/(double)(tD);//templete square div
@@ -55,7 +50,6 @@ public:
 						for (int k=searchWindowSize;k--;)
 						{
 							//templete loop
-							double value = 0.0;
 							double e=0.0;
 							const T* t = tprt;
 							T* s = (T*)(sptr+3*k);
@@ -156,15 +150,11 @@ public:
 	{
 		const int tr = templeteWindowSize>>1;
 		const int sr = searchWindowSize>>1;
-		const int D = searchWindowSize*searchWindowSize;
 		const int cstep  = im->cols-templeteWindowSize;
-		const int csstep = im->cols-searchWindowSize  ;
 		const int imstep = im->cols;
 
-		const int H=D/2+1;
-
 		const int tD = templeteWindowSize*templeteWindowSize;
-		const double tdiv = 1.0/(double)(tD);//templete square div
+		const float tdiv = 1.f/(float)(tD);//templete square div
 		__m128 mtdiv = _mm_set1_ps(tdiv);
 		const int CV_DECL_ALIGNED(16) v32f_absmask_[] = { 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff };
 		const __m128 v32f_absmask = _mm_load_ps((float*)v32f_absmask_);
@@ -195,9 +185,6 @@ public:
 						for (int k=searchWindowSize;k--;)
 						{
 							//templete loop
-							float value = 0.f;
-							double e=0.0;
-
 							float* t = (float*)tprt;
 							float* s = (float*)(sptr+k);
 							//colorstep
@@ -320,17 +307,12 @@ public:
 	{
 		const int tr = templeteWindowSize>>1;
 		const int sr = searchWindowSize>>1;
-		const int D = searchWindowSize*searchWindowSize;
 		const int cstep  = im->cols-templeteWindowSize;
-		const int csstep = im->cols-searchWindowSize  ;
 		const int imstep = im->cols;
 
-		const int H=D/2+1;
-
 		const int tD = templeteWindowSize*templeteWindowSize;
-		const double tdiv = 1.0/(double)(tD);//templete square div
+		const float tdiv = 1.f/(float)(tD);//templete square div
 		__m128 mtdiv = _mm_set1_ps(tdiv);
-		//const int CV_DECL_ALIGNED(16) v32f_absmask[] = { 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff };
 		if(dest->channels()==3)
 		{
 			const int colorstep = im->size().area()/3;
@@ -372,10 +354,6 @@ public:
 						const uchar* sptr = sptr2 +imstep*(l);
 						for (int k=searchWindowSize;k--;)
 						{
-							//templete loop
-							float value = 0.f;
-							double e=0.0;
-
 							uchar* t = (uchar*)tprt;
 							uchar* s = (uchar*)(sptr+k);
 							//colorstep
@@ -505,11 +483,8 @@ public:
 					const __m128i mask2 = _mm_setr_epi8(5, 0, 11, 6, 1, 12, 7, 2, 13, 8, 3, 14, 9, 4, 15, 10);
 					const __m128i mask3 = _mm_setr_epi8(10, 5, 0, 11, 6, 1, 12, 7, 2, 13, 8, 3, 14, 9, 4, 15);
 
-					const __m128i bmask1 = _mm_setr_epi8
-						(0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0);
-
-					const __m128i bmask2 = _mm_setr_epi8
-						(255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255);
+					const __m128i bmask1 = _mm_setr_epi8(0,255,255,0,255,255,0,255,255,0,255,255,0,255,255,0);
+					const __m128i bmask2 = _mm_setr_epi8(255,255,0,255,255,0,255,255,0,255,255,0,255,255,0,255);
 
 					a = _mm_shuffle_epi8(a,mask1);
 					b = _mm_shuffle_epi8(b,mask2);
@@ -542,7 +517,6 @@ public:
 					//search loop
 					uchar* tprt = im->ptr<uchar>(sr+j) + (sr+i); 
 					uchar* sptr2 = im->ptr<uchar>(j) + (i); 
-
 					for(int l=searchWindowSize;l--;)
 					{
 						uchar* sptr = sptr2 +imstep*(l);
@@ -609,18 +583,17 @@ public:
 							mtweight3 = _mm_add_ps(mtweight3,www);
 						}
 					}
-
 					//weight normalization
 					_mm_stream_si128((__m128i*)(d), _mm_packus_epi16(
 						_mm_packs_epi32( _mm_cvtps_epi32(_mm_div_ps(mvalue0,mtweight0)), _mm_cvtps_epi32(_mm_div_ps(mvalue1,mtweight1))), 
 						_mm_packs_epi32( _mm_cvtps_epi32(_mm_div_ps(mvalue2,mtweight2)),_mm_cvtps_epi32(_mm_div_ps(mvalue3,mtweight3)))));
-
 					d+=16; 
 				}//i
 			}//j
 		}
 	}
 };
+
 
 void nonLocalMeansFilterBase(Mat& src, Mat& dest, int templeteWindowSize, int searchWindowSize, double h, double sigma)
 {
@@ -726,7 +699,6 @@ void nonLocalMeansFilter(Mat& src, Mat& dest, int templeteWindowSize, int search
 	float* w = &weight[0];
 	const double gauss_sd = (sigma == 0.0) ? h :sigma;
 	double gauss_color_coeff = -(1.0/(double)(src.channels()))*(1.0/(h*h));
-	int emax=0;
 	for(int i = 0; i < 256*src.channels(); i++ )
 	{
 		double v = std::exp( max(i*i-2.0*gauss_sd*gauss_sd,0.0)*gauss_color_coeff);
