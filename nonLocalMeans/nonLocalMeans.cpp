@@ -705,7 +705,7 @@ void nonLocalMeansFilter(Mat& src, Mat& dest, int templeteWindowSize, int search
 	else
 	{
 		dpad = (4- src.cols%4)%4;
-		spad =  (4-(src.cols+2*bb)%4)%4;
+		spad = (4-(src.cols+2*bb)%4)%4;
 	}
 	Mat dst = Mat::zeros(Size(src.cols+dpad, src.rows),dest.type());
 
@@ -728,7 +728,7 @@ void nonLocalMeansFilter(Mat& src, Mat& dest, int templeteWindowSize, int search
 	const double gauss_sd = (sigma == 0.0) ? h :sigma;
 	double gauss_color_coeff = -(1.0/(double)(src.channels()))*(1.0/(h*h));
 	int emax=0;
-	for(int i = 0; i < 256; i++ )
+	for(int i = 0; i < 256*src.channels(); i++ )
 	{
 		double v = std::exp( max(i*i-2.0*gauss_sd*gauss_sd,0.0)*gauss_color_coeff);
 		w[i] = (float)v;	

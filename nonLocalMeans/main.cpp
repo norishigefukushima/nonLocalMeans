@@ -191,8 +191,6 @@ void test32fc3(bool show=false)
 		waitKey();
 	}
 }
-
-
 int main()
 {
 	test8uc1();
